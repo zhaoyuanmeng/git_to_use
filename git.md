@@ -1,6 +1,6 @@
 ### git基础概念
-    - 客户端并不只是提取最新版本的文件快照，而是把代码仓库完整的镜像下来
-    - git核心本质上是一个键值对数据库。可以向该数据库插入任意类型的内容，
+    * 客户端并不只是提取最新版本的文件快照，而是把代码仓库完整的镜像下来
+    * git核心本质上是一个键值对数据库。可以向该数据库插入任意类型的内容，
       他会返回一个键值，通过该值可以在任意时刻再次检索该内容。
 
 
@@ -33,82 +33,80 @@
     * MV a.txt b.txt 更名字
     * cat a.txt 查看文件内容
     * vim a.txt 编辑内容 i 插入 ese : wq 保存退出 :set nu 设置行号 q! 强制退出不保存
-    * 
+   
 
 ### 对象
     * Git对象
-        echo "hello" | git hash-object --stdin 
-         -- 这句命令返回一个hash值用来标识这句话 但是并没有写到数据库中  
-         -- 内容不一样对应的hash值不一样
+        - echo "hello" | git hash-object --stdin 
+         - 这句命令返回一个hash值用来标识这句话 但是并没有写到数据库中  
+         - 内容不一样对应的hash值不一样
 
-        echo "hello" | git hash-object -w --stdin
-         -- 这句命令返回一个hash值用来标识这句话 并写到数据库中  
-         -- 查看有没有存在 可以通过 find ./ -type f 找对应hash的文件
-         -- 里面的内容是压缩的 通过 git cat-file -p hash注意前面的那两个字母也加上
-         -- git cat-file -t hash 查看git对象的类型 blob
+        - echo "hello" | git hash-object -w --stdin
+         - 这句命令返回一个hash值用来标识这句话 并写到数据库中  
+         - 查看有没有存在 可以通过 find ./ -type f 找对应hash的文件
+         - 里面的内容是压缩的 通过 git cat-file -p hash注意前面的那两个字母也加上
+         - git cat-file -t hash 查看git对象的类型 blob
 
-        将新创建的文件添加到git数据库中即生成一个git对象
-         -- git hash-object -w ./a.txt
+        - 将新创建的文件添加到git数据库中即生成一个git对象
+         - git hash-object -w ./a.txt
 
-        如果文件更改git数据库里面不会自动的添加要手动添加过去 这时会在添加一个git对象
-         -- git hash-object -w ./a.txt
+        - 如果文件更改git数据库里面不会自动的添加要手动添加过去 这时会在添加一个git对象
+         - git hash-object -w ./a.txt
         
-        实质上Git对象是一个KYE：VALUE hash/value    
-        git对象不能当作项目的一次快照 只是组成项目的一部分
+        - 实质上Git对象是一个KYE：VALUE hash/value    
+        - git对象不能当作项目的一次快照 只是组成项目的一部分
 
-        存在的问题？
-         -- 记住文件的每一个（版本）对应的hash值并不现实
-         -- 在git中，文件名并没有被保存，只能通过hash
+        - 存在的问题？
+         - 记住文件的每一个（版本）对应的hash值并不现实
+         - 在git中，文件名并没有被保存，只能通过hash
 
-        注意：此时的操作只是针对本地数据库进行操作，不涉及暂存区。
+        - 注意：此时的操作只是针对本地数据库进行操作，不涉及暂存区。
 
 
     * 树对象
-        树对象能够解决文件名保存的问题，也允许我们将多个文件组织到一起。
+        * 树对象能够解决文件名保存的问题，也允许我们将多个文件组织到一起。
 
-        构建树对象
-         -- git update-index --add --cacheinfo 100644 915c628f360b2d8c3edbe1ac65cf575b69029b61 test.txt
-         -- 文件模式为100644 表明这是一个普通文件
-         -- 文件模式为100755 表明这是一个可执行文件
-         -- 文件模式为120000 表明这是一个符号连接
-         --  --add 因为此前该文件并没有在暂存区中 首次要加add
-         --  --cacheinfo 因为要添加的文件在git数据库中,没有位于当前目录下
+        * 构建树对象
+         - git update-index --add --cacheinfo 100644 915c628f360b2d8c3edbe1ac65cf575b69029b61 test.txt
+         - 文件模式为100644 表明这是一个普通文件
+         - 文件模式为100755 表明这是一个可执行文件
+         - 文件模式为120000 表明这是一个符号连接
+         -  --add 因为此前该文件并没有在暂存区中 首次要加add
+         -  --cacheinfo 因为要添加的文件在git数据库中,没有位于当前目录下
 
-        暂存区做一个快照生成一个对象放到git数据库中
-         -- git write-tree
+        * 暂存区做一个快照生成一个对象放到git数据库中
+         - git write-tree
             对象类型是一个树对象
             树对象里面的内容是暂存区的快照（项目的快照）
-        暂存区中文件名字不变 如果改变文件的内容，就会重新生成一个hash
+        * 暂存区中文件名字不变 如果改变文件的内容，就会重新生成一个hash
 
-        存在的问题？
-         -- 不知道hash值对应的是哪一个版本
-         -- 不知道这个版本的一些基础信息    
+        * 存在的问题？
+         - 不知道hash值对应的是哪一个版本
+         - 不知道这个版本的一些基础信息    
 
     * 提交对象    
-        提交对象完美的解决了上面的问题
-        本质就是给树对象做一层包裹包含项目的基础信息
-        commit-tree创建一个提交对象，为此需要指定一个树对象的hash值,以及该提交的父提交对象
-          -- echo "second commit" | git commit-tree     019fb2c522b604cd94929085bbac93d60e2f2063 -p  d248eb19a125c
+        - 提交对象完美的解决了上面的问题
+        - 本质就是给树对象做一层包裹包含项目的基础信息
+        - commit-tree创建一个提交对象，为此需要指定一个树对象的hash值,以及该提交的父提交对象  
+        - echo "second commit" | git commit-tree     019fb2c522b604cd94929085bbac93d60e2f2063 -p  d248eb19a125c
 
-        真正代表一个项目的是一个提交对象（数据和基本信息）这是一个链式的！！ 
-
-
+        - 真正代表一个项目的是一个提交对象（数据和基本信息）这是一个链式的！！ 
 
 
----------基本开发步骤-----------
+---
 
 ### 初始化git
-    git init （初始化仓库 生成.git文件）
-    git config --global user.name "Is zyd"
-    git config --global user.email 1426593075@qq.com
-    git config --list
+    * git init （初始化仓库 生成.git文件）
+    * git config --global user.name "Is zyd"
+    * git config --global user.email 1426593075@qq.com
+    * git config --list
     
 ### 添加到暂存区
-    * git add ./   首先将工作区（文件）做成git对象放到版本库 然后再放到暂存区 但是这里没有生成树对象
+    * git add ./   首先将工作区（文件）做成git对象放到版本库 然后再放到暂存区 但是这里没    有生成树对象
     * git ls-files -s  查看暂存区的当前状态
 
 ### 添加到版本库
-    git commit -m '提交的信息'
+    * git commit -m '提交的信息'
 
 ### 结论
     * 一次完整的项目提交 包括至少一个提交对象 一个树对象 0或多个git对象
@@ -122,12 +120,12 @@
     * 新建一个分支到一个提交对象上面 这样做的好处是实现版本回推但是不改边主仓库的东西 用完    删除这个分支就可以了特别方便
 
     * 合并分支一定要注意顺序 后面的可能会过期还会存在bug 会产生冲突
-        快速合并 一条分支
-        典型合并 多条分支 会有冲突（打开冲突文件看哪里要留 然后暂存提交）
-        同事之间的冲突才是最麻烦的
-    *     
+        - 快速合并 一条分支
+        - 典型合并 多条分支 会有冲突（打开冲突文件看哪里要留 然后暂存提交）
+        - 同事之间的冲突才是最麻烦的
+       
 
---------ends---------------
+----
 
 
 ### 高级命令（crud）
@@ -138,16 +136,13 @@
     * git diff                查看当先做的哪些更新没有暂存
     * git diff -cached        查看哪些已经更新好了准备下次提交
     * git commit -a -m        git自动将已经跟踪过的文件暂存起来一并提交
-    *
     * rm yd.txt               删除文件 暂存区里没有文集 版本库多了一个提交对象不过没有内容
     * 删除文件属于修改操作 跟上面的提交步骤一样
-    *  
     * mv z.txt zx.txt         重新起名字跟已修改一样的操作
     * git add ./
     * git commit -m "rename zx"
-    * 
     * git log --oneline      查看提交历史记录
-    * 
+   
 
 
 
@@ -161,7 +156,7 @@
     * git log --oneline --decorate --graph --all  查看完整的分支图（没删除前）
     * git config --global alias.lol ‘log --oneline --decorate --graph --all’ 陪别名
     * git branch -v  查看分支的最后一个提交
-   !* git branch test hash  新建一个分支到hash所对应的提交对象上去 很重要
+    * git branch test hash  新建一个分支到hash所对应的提交对象上去 很重要
     * git checkout -b test  创建分支并且切换过去
     * git checkout name     切换分支的时候一定要提交完的时候再切否则会出现问题
       每次切换分支前当前分支一定要是已提交状态 否则会污染主分支 如果第一次提交了再修改的时候没有提交他就不让切换分支了
@@ -169,42 +164,47 @@
          
 
 ### 存储
-    * 出现的原因是 不想过多的创建提交比如iss53那个分支
-    * 
+    * 解决的问题 不想过多的创建提交比如iss53那个分支
     * git stash list 查看存储
     * git stash apply  拿出栈顶的元素 但是不会消除
     * git stash drop 名字
   
----------团队合作------------------- 
+----
 ### 项目经理远程操作github仓库步骤
-    * 先在github上创建一个空的仓库new repository 注意不要有readme.md文件
-    * 创建本地仓库然后基础设置
-    * git init
-    * 然后给github上面的地址起别名和用户别名
-      git remote use https://github.com/zhaoyuanmeng/git_to_use.git
-      git config --list
-
-    * 注意如果是复制别人的github 要把.git删掉只复制项目部分代码到自己的本地仓库
-
-    * 检查完毕后推送到远地仓库
-      git push 
-
-    * 给员工开放权限通过github里面的contribute
-
+    1. 先在github上创建一个空的仓库new repository 注意不要有readme.md文件
+    2. 创建本地仓库然后基础设置   git init
+    3. 然后给github上面的地址起别名和用户别名
+      * git remote use https://github.com/zhaoyuanmeng/git_to_use.git
+      * git config --list
+    4. 注意如果是复制别人的github 要把.git删掉只复制项目部分代码到自己的本地仓库
+    5. 注意凭据 本人是可以直接上传的
+    6. 检查完毕后推送到远地仓库  git push use(别名) master（分支）
+    7. 给员工开放权限通过github里面的manage access contributor
+    8. 获取员工上传的代码 git fetch use(别名)
+    9. 切换成远程跟踪分支 git checkout use/master
+    10. 合并远程跟踪分支 git merge use/master 
+    11. git pull  获取数据并合并
 ### 员工拉取项目经理的仓库代码
-    * 本地不用创建仓库 直接克隆下来
-      git clone 地址
-    *
-    *
-    *
-    *
+    1. 本地不用创建仓库 直接克隆下来
+      * git clone https://github.com/zhaoyuanmeng/git_to_use.git
+    2. 它自动创建一个别名; 查看别名git remote -v       
+    3. 创建新的文件 echo "hello world">test.txt
+    4. git add ./   
+    5. git commit -m "tijiao"
+    6. git push origin master
+    
 
-
-
-
-### 本地分支 远程分支
-    * 
-    *
-    *
-    *      
+### 本地分支 远程分支 远程跟踪分支
+    * 本地分支是本机电脑的
+    * 远程分支是github上对应的分支
+    * 远程跟踪分支是本地与远程分支的一个映射
+    * 成员克隆远程仓库以后默认本地分支和对应的远程跟踪分支有同步关系
+    * 在push的时候会生成对应的远程跟踪分支
+    * 在fetch的时候把数据下载到远程跟踪分支里面
+    * 注意成员开辟新分支提交的时候 经理在fetch的时候要创建对应的分支不用加别名
+    * 只有主分支才有本地分支和远程跟踪分支自动绑定的功能
+    * 建立同步关系 git branch -u (远程跟踪分支) 注意要在那个分支里面输入这个命令
+    * git checkout --track remote别名/分支名  最自动创建本地分支并且与远程跟踪分支绑定
+    * git checkout -b 分支名 remote别名/分支名 效果与上面一样 
+   
       
