@@ -170,6 +170,13 @@
     * git stash drop 名字
   
 ----
+### 后悔药
+    * 工作区撤回在工作目录中的修改
+      * git checkout -- filename  本质是相当于重置
+    * 暂存区撤回自己的暂存
+      * git reset HEAD filename
+    * 提交区注释写错了修改注释
+      * git commit --amend   
 ### 项目经理远程操作github仓库步骤
     1. 先在github上创建一个空的仓库new repository 注意不要有readme.md文件
     2. 创建本地仓库然后基础设置   git init
@@ -202,9 +209,67 @@
     * 在push的时候会生成对应的远程跟踪分支
     * 在fetch的时候把数据下载到远程跟踪分支里面
     * 注意成员开辟新分支提交的时候 经理在fetch的时候要创建对应的分支不用加别名
-    * 只有主分支才有本地分支和远程跟踪分支自动绑定的功能
+    * 主分支和远程跟踪分支自动绑定的功能(默认情况下push的时候)
     * 建立同步关系 git branch -u (远程跟踪分支) 注意要在那个分支里面输入这个命令
     * git checkout --track remote别名/分支名  最自动创建本地分支并且与远程跟踪分支绑定
-    * git checkout -b 分支名 remote别名/分支名 效果与上面一样 
-   
-      
+    * git checkout -b 分支名 remote别名/分支名 效果与上面一样     
+### 删除远程分支
+    * git push use(别名) --delete (分支名)  删除远程分支
+    * git remote prune use --dry-run  列出仍在远程跟踪但是远程分支已经被删除的无用分支
+    * git remote prune use    清除上面的命令列出来的远程跟宗
+### 冲突
+
+    * git本地操作的冲突
+        * 典型合并的时候
+        * 
+    * git远程协作的时候
+        * push
+            * 两个人同时推（更改同一个文件）解决办法只能先把远程仓库拉下来 然后再更改那个    文件然后再add commit push  
+        * pull
+            * 更改完以后不push 直接pull会报错 远程仓库会覆盖更改的内容建议push 不过push还会出错就是上面那个错误
+
+
+
+### 参加开源项目的步骤 （pull request） 
+    * 如果参加某个项目时，但是没有推送权限，这时候可以通过对这个项目进行fork。这会在
+      你的空间中创建一个完全属于你的项目副本，且你对其具有推送权限。通过这个方式项目的
+      管理者不用忙着添加贡献者，人们可以fork这个项目将修改推送到项目副本上，并通过pull 
+      request来将他们的改动进入源版本库
+    
+    1. 先将源仓库fork到自己的仓库
+    2. 然后clone到本地仓库
+    3. 更改后提交到自己的远程仓库
+    4. pull request
+    5. 管理人审核 然后merge
+    
+    * 不重新fork怎么解决
+      * git 支持同时跟踪多个仓库
+        git remote add 别名2 地址
+        <!-- git remote rm 别名1 -->
+        git fetch 别名2
+        git branch -u 远程跟踪分支
+        git merge 对应的远程跟踪分支
+        git push (这里还是会提交到自己上面)
+        然后pull request
+        
+
+    
+
+
+### SSH
+    * github特有的一种协议 走的不是验证密码的道路而是密匙
+    * 配置步骤
+      * ssh -keygen -t rsa -C 邮箱名
+      * 在c:\users\Adminstor\.ssh下生成公私密匙
+      * ssh -T git@github.com 测试一下
+      * 把公共的密匙复制到github账户里面setting下
+      * 好处是不用每次输密码 而且项目经理不用设置贡献者 直接把他们的公共密匙复制到自己账户    就可以了
+  
+    
+
+
+
+
+### .gitnore文件
+    * 这个文件可以直接从github上下载
+    * 目的是不在git仓库上传不必要的文件
