@@ -181,7 +181,7 @@
     1. 先在github上创建一个空的仓库new repository 注意不要有readme.md文件
     2. 创建本地仓库然后基础设置   git init
     3. 然后给github上面的地址起别名和用户别名
-      * git remote use https://github.com/zhaoyuanmeng/git_to_use.git
+      * git remote add use https://github.com/zhaoyuanmeng/git_to_use.git
       * git config --list
     4. 注意如果是复制别人的github 要把.git删掉只复制项目部分代码到自己的本地仓库
     5. 注意凭据 本人是可以直接上传的
